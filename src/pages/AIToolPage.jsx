@@ -78,7 +78,19 @@ function AIToolPage() {
           actionsApplied: result.data.actionsApplied,
         });
 
-        toast.success('Image processed successfully!');
+        // Check if fallback was used (AI quota exceeded)
+        if (result.data.aiInstructions?.usedFallback) {
+          toast('⚠️ AI service busy - Used smart preset processing instead', {
+            icon: '🔄',
+            duration: 5000,
+            style: {
+              background: '#fef3c7',
+              color: '#92400e',
+            },
+          });
+        } else {
+          toast.success('Image processed successfully!');
+        }
         navigate('/result');
       } else {
         throw new Error(result.error || 'Processing failed');
