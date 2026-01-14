@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+
+# Environment variables - NEVER commit these!
+.env
+.env.local
+.env.*.local
+*.env
+
+# Keep .env.example for reference
+!.env.example
+
+# Build outputs
+dist/
+build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Vite
+.vite/
+
+# IDE & Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.sublime-workspace
+.sublime-project
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Local Netlify folder
+.netlify
+
+# Vercel
+.vercel
+
+# Optional eslint cache
+.eslintcache
+
+# Testing
+coverage/
