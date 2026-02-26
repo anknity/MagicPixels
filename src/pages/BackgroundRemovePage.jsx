@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Scissors, Loader2, Download, Palette } from 'lucide-react';
+import { Scissors, Loader2, Download, Palette, Sliders, Target } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ImageUploader from '../components/ImageUploader';
 import ProcessingOverlay from '../components/ProcessingOverlay';
@@ -17,6 +17,12 @@ const backgroundColors = [
   { name: 'Gray', value: '#6b7280', preview: 'bg-gray-500' },
 ];
 
+const precisionLevels = [
+  { value: 'low', label: 'Fast', desc: 'Quick processing, basic edges' },
+  { value: 'medium', label: 'Balanced', desc: 'Good balance of speed & quality' },
+  { value: 'high', label: 'Precision', desc: 'Best quality, refined edges' },
+];
+
 function BackgroundRemovePage() {
   const [file, setFile] = useState(null);
   const [currentImage, setCurrentImage] = useState(null);
@@ -24,6 +30,9 @@ function BackgroundRemovePage() {
   const [customColor, setCustomColor] = useState('#ffffff');
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState(null);
+  const [precision, setPrecision] = useState('high');
+  const [feather, setFeather] = useState(1);
+  const [edgeRefinement, setEdgeRefinement] = useState(true);
 
   const handleUpload = (uploadedFile) => {
     setFile(uploadedFile);
@@ -49,7 +58,11 @@ function BackgroundRemovePage() {
       let response;
 
       if (selectedBg === 'transparent') {
-        response = await backgroundApi.remove(file);
+        response = await backgroundApi.remove(file, {
+          precision,
+          feather: feather.toString(),
+          edgeRefinement: edgeRefinement.toString(),
+        });
       } else {
         const bgColor = selectedBg === 'custom' ? customColor : selectedBg;
         response = await backgroundApi.replace(file, bgColor);
@@ -221,6 +234,68 @@ function BackgroundRemovePage() {
             </div>
 
             {/* Info */}
+            <div className="card p-6">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <Sliders className="w-5 h-5 text-primary-400" />
+                Precision Controls
+              </h3>
+              
+              {/* Precision Level */}
+              <div className="mb-4">
+                <label className="text-sm text-dark-300 mb-2 block">Quality Level</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {precisionLevels.map((level) => (
+                    <button
+                      key={level.value}
+                      onClick={() => setPrecision(level.value)}
+                      className={`p-2.5 rounded-lg text-center transition-all ${
+                        precision === level.value
+                          ? 'bg-primary-500/20 border border-primary-500/50 text-primary-400'
+                          : 'bg-dark-800 border border-dark-700 text-dark-300 hover:text-white'
+                      }`}
+                    >
+                      <div className="text-sm font-medium">{level.label}</div>
+                      <div className="text-[10px] text-dark-500 mt-0.5">{level.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Edge Feathering */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm text-dark-300">Edge Feather</label>
+                  <span className="text-xs text-dark-500">{feather}px</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="5"
+                  value={feather}
+                  onChange={(e) => setFeather(parseInt(e.target.value))}
+                  className="w-full accent-primary-500"
+                />
+              </div>
+
+              {/* Edge Refinement Toggle */}
+              <div className="flex items-center justify-between p-3 bg-dark-800/50 rounded-lg">
+                <div>
+                  <span className="text-sm text-white">Edge Refinement</span>
+                  <p className="text-xs text-dark-500">Smoother subject edges</p>
+                </div>
+                <button
+                  onClick={() => setEdgeRefinement(!edgeRefinement)}
+                  className={`w-11 h-6 rounded-full transition-colors relative ${
+                    edgeRefinement ? 'bg-primary-500' : 'bg-dark-600'
+                  }`}
+                >
+                  <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
+                    edgeRefinement ? 'translate-x-5' : 'translate-x-0.5'
+                  }`} />
+                </button>
+              </div>
+            </div>
+
             <div className="card p-6">
               <h3 className="text-lg font-semibold text-white mb-4">How it works</h3>
               <div className="text-dark-400 text-sm space-y-2">

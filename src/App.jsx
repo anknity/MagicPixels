@@ -9,6 +9,8 @@ import ConvertPage from './pages/ConvertPage';
 import PDFToolsPage from './pages/PDFToolsPage';
 import BackgroundRemovePage from './pages/BackgroundRemovePage';
 import CloudinaryToolsPage from './pages/CloudinaryToolsPage';
+import CropPage from './pages/CropPage';
+import WatermarkRemovePage from './pages/WatermarkRemovePage';
 
 function App() {
   return (
@@ -21,8 +23,10 @@ function App() {
         <Route path="resize" element={<ResizePage />} />
         <Route path="compress" element={<CompressPage />} />
         <Route path="convert" element={<ConvertPage />} />
+        <Route path="crop" element={<CropPage />} />
         <Route path="pdf-tools" element={<PDFToolsPage />} />
         <Route path="background-remove" element={<BackgroundRemovePage />} />
+        <Route path="watermark-remove" element={<WatermarkRemovePage />} />
       </Route>
     </Routes>
   );

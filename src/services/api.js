@@ -495,4 +495,105 @@ export const cloudinaryApi = {
 // Health check
 export const healthCheck = () => api.get('/health');
 
+// Crop API
+export const cropApi = {
+  crop: (file, coords) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    Object.entries(coords).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    return api.post('/crop', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  aspectRatio: (file, ratio, gravity = 'center') => {
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('ratio', ratio);
+    formData.append('gravity', gravity);
+    return api.post('/crop/aspect-ratio', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  circle: (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    return api.post('/crop/circle', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  freeform: (file, options) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    Object.entries(options).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    return api.post('/crop/freeform', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  presets: () => api.get('/crop/presets'),
+};
+
+// Watermark Remove API
+export const watermarkApi = {
+  remove: (file, options = {}) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    Object.entries(options).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    return api.post('/watermark-remove', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  detect: (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    return api.post('/watermark-remove/detect', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+};
+
+// PDF extended methods
+export const pdfExtendedApi = {
+  toImages: (file, options = {}) => {
+    const formData = new FormData();
+    formData.append('pdf', file);
+    Object.entries(options).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    return api.post('/pdf/to-images', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  addPageNumbers: (file, options = {}) => {
+    const formData = new FormData();
+    formData.append('pdf', file);
+    Object.entries(options).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    return api.post('/pdf/add-page-numbers', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  rotate: (file, rotation = 90) => {
+    const formData = new FormData();
+    formData.append('pdf', file);
+    formData.append('rotation', rotation);
+    return api.post('/pdf/rotate', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+};
+
 export default api;

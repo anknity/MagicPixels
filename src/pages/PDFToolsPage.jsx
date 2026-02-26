@@ -1,16 +1,19 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { motion } from 'framer-motion';
-import { FileText, Loader2, Download, Upload, Merge, Split, Stamp, X } from 'lucide-react';
+import { FileText, Loader2, Download, Upload, Merge, Split, Stamp, X, Image, Hash, RotateCcw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ProcessingOverlay from '../components/ProcessingOverlay';
-import { pdfApi } from '../services/api';
+import { pdfApi, pdfExtendedApi } from '../services/api';
 
 const tools = [
   { id: 'create', name: 'Images to PDF', icon: FileText, description: 'Create PDF from images' },
+  { id: 'toImages', name: 'PDF to Images', icon: Image, description: 'Convert PDF pages to images' },
   { id: 'merge', name: 'Merge PDFs', icon: Merge, description: 'Combine multiple PDFs' },
   { id: 'split', name: 'Split PDF', icon: Split, description: 'Split PDF into pages' },
   { id: 'watermark', name: 'Add Watermark', icon: Stamp, description: 'Add text watermark' },
+  { id: 'pageNumbers', name: 'Page Numbers', icon: Hash, description: 'Add page numbers' },
+  { id: 'rotate', name: 'Rotate Pages', icon: RotateCcw, description: 'Rotate PDF pages' },
 ];
 
 function PDFToolsPage() {
@@ -20,6 +23,8 @@ function PDFToolsPage() {
   const [result, setResult] = useState(null);
   const [watermarkText, setWatermarkText] = useState('');
   const [pageSize, setPageSize] = useState('A4');
+  const [rotation, setRotation] = useState(90);
+  const [pageNumberPosition, setPageNumberPosition] = useState('bottom-center');
 
   const onDrop = useCallback((acceptedFiles) => {
     setFiles((prev) => [...prev, ...acceptedFiles]);
@@ -31,7 +36,7 @@ function PDFToolsPage() {
     accept: selectedTool === 'create' 
       ? { 'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp'] }
       : { 'application/pdf': ['.pdf'] },
-    multiple: true,
+    multiple: selectedTool === 'create' || selectedTool === 'merge',
   });
 
   const removeFile = (index) => {
@@ -91,6 +96,24 @@ function PDFToolsPage() {
             throw new Error('Please enter watermark text');
           }
           response = await pdfApi.watermark(files[0], watermarkText);
+          break;
+        case 'toImages':
+          if (files.length !== 1) {
+            throw new Error('Please add exactly 1 PDF');
+          }
+          response = await pdfExtendedApi.toImages(files[0], { format: 'png', quality: 90 });
+          break;
+        case 'pageNumbers':
+          if (files.length !== 1) {
+            throw new Error('Please add exactly 1 PDF');
+          }
+          response = await pdfExtendedApi.addPageNumbers(files[0], { position: pageNumberPosition });
+          break;
+        case 'rotate':
+          if (files.length !== 1) {
+            throw new Error('Please add exactly 1 PDF');
+          }
+          response = await pdfExtendedApi.rotate(files[0], rotation);
           break;
         default:
           throw new Error('Invalid tool selected');
@@ -166,7 +189,7 @@ function PDFToolsPage() {
             PDF Tools
           </h1>
           <p className="text-dark-400 max-w-xl mx-auto">
-            Create PDFs from images, merge, split, and add watermarks.
+            Create PDFs from images, convert to images, merge, split, watermark, add page numbers & rotate.
           </p>
         </motion.div>
 
@@ -175,7 +198,7 @@ function PDFToolsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8"
+          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-8"
         >
           {tools.map((tool) => {
             const Icon = tool.icon;
@@ -272,6 +295,24 @@ function PDFToolsPage() {
                       </div>
                     ))}
                   </div>
+                ) : result.pages ? (
+                  <div className="space-y-2">
+                    <p className="text-sm text-dark-400 mb-2">{result.totalPages} pages converted</p>
+                    {result.pages.map((page, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-dark-800 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <img src={page.url} alt={`Page ${page.page}`} className="w-10 h-14 object-cover rounded" />
+                          <span className="text-dark-300 text-sm">Page {page.page}</span>
+                        </div>
+                        <button
+                          onClick={() => handleDownload(page.url, `page-${page.page}.${page.format || 'png'}`)}
+                          className="text-primary-400 hover:text-primary-300"
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
                   <button
                     onClick={() => handleDownload(result.url)}
@@ -327,6 +368,58 @@ function PDFToolsPage() {
               </div>
             )}
 
+            {selectedTool === 'toImages' && (
+              <div className="card p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">PDF to Images</h3>
+                <p className="text-dark-400 text-sm">
+                  Upload a PDF and each page will be converted to a high-quality PNG image.
+                  You can download each page individually.
+                </p>
+              </div>
+            )}
+
+            {selectedTool === 'pageNumbers' && (
+              <div className="card p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Page Number Position</h3>
+                <div className="grid grid-cols-3 gap-2">
+                  {['top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right'].map((pos) => (
+                    <button
+                      key={pos}
+                      onClick={() => setPageNumberPosition(pos)}
+                      className={`p-2.5 rounded-lg border text-xs font-medium transition-all ${
+                        pageNumberPosition === pos
+                          ? 'bg-primary-500/20 border-primary-500 text-primary-400'
+                          : 'bg-dark-800 border-dark-600 text-dark-300 hover:border-dark-500'
+                      }`}
+                    >
+                      {pos.replace('-', ' ')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {selectedTool === 'rotate' && (
+              <div className="card p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Rotation Angle</h3>
+                <div className="grid grid-cols-4 gap-2">
+                  {[90, 180, 270, -90].map((angle) => (
+                    <button
+                      key={angle}
+                      onClick={() => setRotation(angle)}
+                      className={`p-3 rounded-lg border text-sm font-medium transition-all ${
+                        rotation === angle
+                          ? 'bg-primary-500/20 border-primary-500 text-primary-400'
+                          : 'bg-dark-800 border-dark-600 text-dark-300 hover:border-dark-500'
+                      }`}
+                    >
+                      {angle}°
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Instructions */}
             <div className="card p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Instructions</h3>
@@ -357,6 +450,27 @@ function PDFToolsPage() {
                     <p>• Upload a single PDF file</p>
                     <p>• Enter the watermark text</p>
                     <p>• Watermark will be added to all pages</p>
+                  </>
+                )}
+                {selectedTool === 'toImages' && (
+                  <>
+                    <p>• Upload a single PDF file</p>
+                    <p>• Each page is converted to a PNG image</p>
+                    <p>• Download individual page images</p>
+                  </>
+                )}
+                {selectedTool === 'pageNumbers' && (
+                  <>
+                    <p>• Upload a single PDF file</p>
+                    <p>• Choose where to place page numbers</p>
+                    <p>• Numbers added in "Page X of Y" format</p>
+                  </>
+                )}
+                {selectedTool === 'rotate' && (
+                  <>
+                    <p>• Upload a single PDF file</p>
+                    <p>• Choose rotation angle</p>
+                    <p>• All pages will be rotated</p>
                   </>
                 )}
               </div>

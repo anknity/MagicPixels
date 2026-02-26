@@ -16,6 +16,9 @@ import {
   ZoomIn,
   Expand,
   Palette,
+  Crop,
+  Droplets,
+  Brain,
 } from 'lucide-react';
 
 const tools = [
@@ -50,11 +53,43 @@ const tools = [
     gradient: 'from-orange-500 to-amber-500',
   },
   {
+    path: '/crop',
+    icon: Crop,
+    title: 'Crop Images',
+    description: 'Smart crop with aspect ratios, circle crop & social media presets',
+    gradient: 'from-emerald-500 to-teal-500',
+    badge: 'New',
+  },
+  {
+    path: '/background-remove',
+    icon: Eraser,
+    title: 'Background Remove',
+    description: 'Precision background removal with edge refinement and color targeting',
+    gradient: 'from-sky-500 to-blue-500',
+    badge: 'Improved',
+  },
+  {
+    path: '/watermark-remove',
+    icon: Droplets,
+    title: 'Watermark Remover',
+    description: 'AI-powered watermark detection and removal with multiple algorithms',
+    gradient: 'from-violet-500 to-purple-500',
+    badge: 'New • AI',
+  },
+  {
     path: '/pdf-tools',
     icon: Image,
     title: 'PDF Tools',
-    description: 'Create PDFs from images, merge, split, and add watermarks',
+    description: 'Create PDFs, merge, split, watermark, page numbers, rotate & PDF to image',
     gradient: 'from-red-500 to-rose-500',
+  },
+  {
+    path: '/ai-tool',
+    icon: Brain,
+    title: 'AI Editor',
+    description: 'Natural language image editing powered by Groq & Gemini AI models',
+    gradient: 'from-fuchsia-500 to-pink-500',
+    badge: 'Groq AI',
   },
 ];
 
@@ -63,6 +98,8 @@ const aiFeatures = [
   { icon: ZoomIn, name: 'Upscale', desc: 'AI image upscaling' },
   { icon: Expand, name: 'Gen Fill', desc: 'Extend with AI' },
   { icon: Palette, name: 'Recolor', desc: 'AI object recoloring' },
+  { icon: Droplets, name: 'Watermark', desc: 'AI watermark removal' },
+  { icon: Brain, name: 'Groq AI', desc: 'Smart editing with AI' },
 ];
 
 const features = [
@@ -108,7 +145,7 @@ function HomePage() {
             >
               <Sparkles className="w-4 h-4 text-primary-400" />
               <span className="text-primary-400 text-sm font-medium">
-                AI-Powered Image Processing
+                Powered by Groq &amp; Gemini AI
               </span>
             </motion.div>
 

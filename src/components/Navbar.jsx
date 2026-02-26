@@ -12,6 +12,9 @@ import {
   Scissors, 
   Wand2,
   Cloud,
+  Crop,
+  Droplets,
+  Eraser,
 } from 'lucide-react';
 
 const navLinks = [
@@ -19,6 +22,9 @@ const navLinks = [
   { path: '/resize', label: 'Resize', icon: Minimize2 },
   { path: '/compress', label: 'Compress', icon: FileDown },
   { path: '/convert', label: 'Convert', icon: FileType },
+  { path: '/crop', label: 'Crop', icon: Crop },
+  { path: '/background-remove', label: 'BG Remove', icon: Eraser },
+  { path: '/watermark-remove', label: 'Watermark', icon: Droplets },
   { path: '/pdf-tools', label: 'PDF', icon: Image },
 ];
 

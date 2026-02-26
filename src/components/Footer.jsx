@@ -54,6 +54,11 @@ function Footer() {
             <h3 className="text-white font-semibold mb-4">More Tools</h3>
             <ul className="space-y-2">
               <li>
+                <Link to="/crop" className="text-dark-400 hover:text-primary-400 text-sm transition-colors">
+                  Crop Images
+                </Link>
+              </li>
+              <li>
                 <Link to="/pdf-tools" className="text-dark-400 hover:text-primary-400 text-sm transition-colors">
                   PDF Tools
                 </Link>
@@ -61,6 +66,11 @@ function Footer() {
               <li>
                 <Link to="/background-remove" className="text-dark-400 hover:text-primary-400 text-sm transition-colors">
                   Remove Background
+                </Link>
+              </li>
+              <li>
+                <Link to="/watermark-remove" className="text-dark-400 hover:text-primary-400 text-sm transition-colors">
+                  Remove Watermark
                 </Link>
               </li>
             </ul>
